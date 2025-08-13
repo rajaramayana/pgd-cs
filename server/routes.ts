@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertInquirySchema, insertDownloadSchema } from "@shared/schema";
 import { generateProgramBrochure, generateDetailedSyllabus } from "./services/pdf-service";
+import { generateCourseSyllabus } from "./services/course-syllabus-service";
 import { sendInquiryNotification } from "./services/email-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -82,6 +83,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download individual course syllabus
+  app.post("/api/download/course/:courseCode", async (req, res) => {
+    try {
+      const { courseCode } = req.params;
+      const { email } = req.body;
+      
+      // Track download
+      await storage.createDownload({
+        type: "course",
+        courseCode: courseCode,
+        email: email || null,
+      });
+
+      const pdfBuffer = await generateCourseSyllabus(courseCode);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${courseCode}-Syllabus.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to generate course syllabus" 
+      });
+    }
+  });
+
   // Get download statistics
   app.get("/api/downloads/stats", async (req, res) => {
     try {
@@ -90,6 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         total: downloads.length,
         brochure: downloads.filter(d => d.type === "brochure").length,
         syllabus: downloads.filter(d => d.type === "syllabus").length,
+        course: downloads.filter(d => d.type === "course").length,
       };
       res.json(stats);
     } catch (error) {

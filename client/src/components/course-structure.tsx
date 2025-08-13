@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Course {
   code: string;
@@ -8,6 +11,51 @@ interface Course {
 }
 
 export default function CourseStructure() {
+  const [downloadingCourse, setDownloadingCourse] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleCourseDownload = async (courseCode: string) => {
+    setDownloadingCourse(courseCode);
+    
+    try {
+      const response = await fetch(`/api/download/course/${courseCode.replace(/\s/g, '')}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to download ${courseCode} syllabus`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${courseCode.replace(/\s/g, '')}-Syllabus.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Download Started",
+        description: `${courseCode} syllabus download has started.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: `Failed to download ${courseCode} syllabus. Please try again.`,
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingCourse(null);
+    }
+  };
+
   const semester1Courses: Course[] = [
     {
       code: "PGDCS 101",
@@ -102,11 +150,23 @@ export default function CourseStructure() {
             <div className="space-y-4">
               {semester1Courses.map((course, index) => (
                 <div key={course.code} className="bg-white rounded-lg p-4 shadow-sm" data-testid={`sem1-course-${index}`}>
-                  <h4 className="font-semibold text-primary mb-1">
-                    {course.code}: {course.title}
-                  </h4>
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-primary">
+                      {course.code}: {course.title}
+                    </h4>
+                    <Button
+                      onClick={() => handleCourseDownload(course.code)}
+                      disabled={downloadingCourse === course.code}
+                      variant="ghost"
+                      size="sm"
+                      className="text-primary hover:text-primary/80 p-1"
+                      data-testid={`download-${course.code.replace(/\s/g, '')}`}
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </div>
                   <p className="text-sm text-slate-600 mb-2">{course.credits} Credits</p>
-                  <p className="text-slate-700">{course.description}</p>
+                  <p className="text-slate-700 text-sm">{course.description}</p>
                 </div>
               ))}
             </div>
@@ -120,11 +180,23 @@ export default function CourseStructure() {
             <div className="space-y-4">
               {semester2Courses.map((course, index) => (
                 <div key={course.code} className="bg-white rounded-lg p-4 shadow-sm" data-testid={`sem2-course-${index}`}>
-                  <h4 className="font-semibold text-primary mb-1">
-                    {course.code}: {course.title}
-                  </h4>
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-primary">
+                      {course.code}: {course.title}
+                    </h4>
+                    <Button
+                      onClick={() => handleCourseDownload(course.code)}
+                      disabled={downloadingCourse === course.code}
+                      variant="ghost"
+                      size="sm"
+                      className="text-primary hover:text-primary/80 p-1"
+                      data-testid={`download-${course.code.replace(/\s/g, '')}`}
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </div>
                   <p className="text-sm text-slate-600 mb-2">{course.credits} Credits</p>
-                  <p className="text-slate-700">{course.description}</p>
+                  <p className="text-slate-700 text-sm">{course.description}</p>
                 </div>
               ))}
             </div>

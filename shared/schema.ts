@@ -16,7 +16,8 @@ export const inquiries = pgTable("inquiries", {
 
 export const downloads = pgTable("downloads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  type: text("type").notNull(), // 'brochure' or 'syllabus'
+  type: text("type").notNull(), // 'brochure', 'syllabus', or 'course'
+  courseCode: text("course_code"), // For individual course syllabi
   email: text("email"),
   downloadedAt: timestamp("downloaded_at").defaultNow().notNull(),
 });
