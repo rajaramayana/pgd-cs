@@ -94,7 +94,7 @@ export default function Contact() {
     {
       icon: MapPin,
       title: "Address",
-      content: ["Department of Computer Science", "University Campus", "Kathmandu, Nepal"]
+      content: ["Purbanchal University", "Faculty of Science and Technology", "Biratnagar, Nepal"]
     },
     {
       icon: Phone,
