@@ -87,3 +87,6 @@ Preferred communication style: Simple, everyday language.
 - **Replit Integration**: Custom Vite plugins for Replit development environment
 - **Environmental Configuration**: Environment-based configuration for database and services
 - **Session Management**: PostgreSQL-backed session storage for production use
+- **Multi-Platform Deployment**: Configured for Heroku, Vercel, Netlify, Railway, and Digital Ocean
+- **Deployment Files**: Procfile, app.json, vercel.json, netlify.toml for platform-specific deployment
+- **Build Process**: Dual-build system for frontend (Vite) and backend (ESBuild) optimization

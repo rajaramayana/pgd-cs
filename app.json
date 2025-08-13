@@ -1,0 +1,34 @@
+{
+  "name": "pgdcs-landing-page",
+  "description": "Post Graduate Diploma in Cyber Security academic website with downloadable resources",
+  "keywords": ["cybersecurity", "education", "academic", "landing-page"],
+  "website": "https://your-app-name.herokuapp.com",
+  "repository": "https://github.com/your-username/pgdcs-landing",
+  "logo": "https://your-app-name.herokuapp.com/logo.png",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "npm run db:push"
+  },
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment mode",
+      "value": "production"
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL database URL for production deployment",
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "stack": "heroku-22"
+}
